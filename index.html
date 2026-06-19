@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎀 MARKET EXPRESS| Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --orange: #f68b1e; --grey: #f8f9fa; --blue: #007bff; }
+        body { font-family: sans-serif; margin: 0; background: var(--grey); padding-bottom: 120px; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        .spinner { width: 35px; height: 35px; border: 4px solid #f3f3f3; border-top: 4px solid var(--orange); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Top Header */
+        .top-header { background: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 20px; font-weight: 900; letter-spacing: 0.5px; }
+        .account-trigger { color: var(--blue); font-size: 26px; cursor: pointer; }
+
+        /* Search & Filters */
+        .search-area { background: white; padding: 0 15px 10px; display: flex; gap: 10px; align-items: center; }
+        .search-container { position: relative; flex: 1; }
+        .search-container i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #aaa; }
+        .search-input { width: 100%; padding: 10px 10px 10px 35px; border: 1px solid #eee; border-radius: 10px; background: #f9f9f9; box-sizing: border-box; font-size: 14px; outline: none; }
+        .filter-btn { background: var(--orange); color: white; border: none; width: 40px; height: 40px; border-radius: 10px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+
+        .category-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 5px 15px 15px; white-space: nowrap; scrollbar-width: none; }
+        .category-scroll::-webkit-scrollbar { display: none; }
+        .chip { background: white; padding: 6px 15px; border-radius: 20px; font-size: 12px; border: 1px solid #eee; cursor: pointer; color: #555; }
+        .chip.active { background: var(--orange); color: white; border-color: var(--orange); font-weight: bold; }
+
+        /* Product Grid */
+        .container { padding: 0 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .product-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid #eee; }
+        .product-card img { width: 100%; height: 130px; object-fit: cover; background: #eee; }
+        .p-info { padding: 8px; }
+        .p-info b { font-size: 13px; display: block; margin-bottom: 3px; color: #333; }
+        .p-info span { color: var(--orange); font-weight: 800; font-size: 14px; }
+        .add-btn { width: 100%; background: var(--orange); color: white; border: none; padding: 8px; border-radius: 8px; margin-top: 6px; font-weight: bold; cursor: pointer; font-size: 11px; }
+
+        /* Footer Links for AdSense */
+        .footer-links { text-align: center; padding: 30px 15px; background: white; margin-top: 20px; border-top: 1px solid #eee; }
+        .footer-links a { color: #888; text-decoration: none; font-size: 13px; margin: 0 10px; }
+
+        /* Bottom Nav */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; z-index: 1000; }
+        .nav-item { text-align: center; color: #888; font-size: 11px; text-decoration: none; flex: 1; cursor: pointer; }
+        .nav-item i { font-size: 20px; display: block; margin-bottom: 3px; }
+        .nav-item.active { color: var(--orange); }
+    </style>
+</head>
+<body>
+
+<div id="loader"><div class="spinner"></div></div>
+
+<div class="top-header">
+    <div class="logo">🎀 MARKET EXPRESS.</div>
+    <div class="account-trigger" onclick="checkAccount()"><i class="fas fa-user-circle"></i></div>
+</div>
+
+<div class="search-area">
+    <div class="search-container">
+        <i class="fas fa-search"></i>
+        <input type="text" class="search-input" id="searchBox" placeholder="Search..." oninput="handleSearch()">
+    </div>
+    <button class="filter-btn"><i class="fas fa-sliders-h"></i></button>
+</div>
+
+<div class="category-scroll" id="catScroll">
+    <div class="chip active" onclick="filterByCat('All', this)">All</div>
+    <div class="chip" onclick="filterByCat('Shoes', this)">Shoes</div>
+    <div class="chip" onclick="filterByCat('Bags', this)">Bags</div>
+    <div class="chip" onclick="filterByCat('Perfumes', this)">Perfumes</div>
+    <div class="chip" onclick="filterByCat('Watches', this)">Watches</div>
+</div>
+
+<div class="container" id="productGrid"></div>
+
+<div class="footer-links">
+    <a href="about.html">About Us</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <p style="font-size: 11px; color: #bbb; margin-top: 10px;">&copy; 2026 MARKET EXPRESS Collections</p>
+</div>
+
+<div class="nav-bar">
+    <div onclick="window.location.reload()" class="nav-item active"><i class="fas fa-home"></i>Home</div>
+    <div onclick="window.location.href='categories.html'" class="nav-item"><i class="fas fa-th-large"></i>Categories</div>
+    <div onclick="window.location.href='cart.html'" class="nav-item"><i class="fas fa-shopping-basket"></i>Cart</div>
+    <div onclick="window.location.href='track.html'" class="nav-item"><i class="fas fa-truck"></i>Track</div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, query, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = { 
+        apiKey: "AIzaSyC1w8tUDW6XTfkPceprjj1kJed9CM5r6YA", 
+        authDomain: "enitan-collection-7e541.firebaseapp.com", 
+        projectId: "enitan-collection-7e541" 
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    let allProducts = [];
+
+    const q = query(collection(db, "products"), orderBy("timestamp", "desc"));
+    onSnapshot(q, (snapshot) => {
+        allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderProducts(allProducts);
+        document.getElementById('loader').style.display = 'none';
+    });
+
+    function renderProducts(list) {
+        const grid = document.getElementById('productGrid');
+        grid.innerHTML = list.map(item => `
+            <div class="product-card">
+                <img src="${item.image}" alt="${item.name}">
+                <div class="p-info">
+                    <b>${item.name}</b>
+                    <span>₦${Number(item.price).toLocaleString()}</span>
+                    <button class="add-btn" onclick="addToCart('${item.name}', '${item.price}', '${item.image}')">ADD TO CART</button>
+                </div>
+            </div>`).join('');
+    }
+
+    window.handleSearch = () => {
+        const term = document.getElementById('searchBox').value.toLowerCase();
+        const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term));
+        renderProducts(filtered);
+    };
+
+    window.filterByCat = (cat, el) => {
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        const filtered = cat === 'All' ? allProducts : allProducts.filter(p => p.category === cat);
+        renderProducts(filtered);
+    };
+
+    window.checkAccount = () => {
+        const user = localStorage.getItem('enitan_user');
+        window.location.href = user ? 'profile.html' : 'auth.html';
+    };
+
+    window.addToCart = (name, price, image) => {
+        let cart = JSON.parse(localStorage.getItem('enitan_cart')) || [];
+        cart.push({ name, price, image });
+        localStorage.setItem('enitan_cart', JSON.stringify(cart));
+        alert(name + " added to cart!");
+    };
+</script>
+</body>
+</html>

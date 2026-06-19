@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | 🎀MARKET EXPRESS 🎀</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --orange: #f68b1e; --grey: #f8f9fa; }
+        body { font-family: sans-serif; margin: 0; background: var(--grey); line-height: 1.6; color: #333; padding-bottom: 100px; }
+        
+        .header { background: white; padding: 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 18px; font-weight: 900; }
+        
+        .content { padding: 25px; max-width: 600px; margin: 0 auto; background: white; min-height: 80vh; border-radius: 0 0 20px 20px; }
+        h1 { color: var(--orange); font-size: 26px; margin-top: 0; }
+        h2 { border-left: 4px solid var(--orange); padding-left: 10px; margin-top: 30px; font-size: 18px; color: #111; }
+        p { margin-bottom: 15px; font-size: 15px; color: #555; }
+        ul { padding-left: 20px; color: #555; font-size: 15px; }
+
+        /* Bottom Nav Bar */
+        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; z-index: 1000; }
+        .nav-item { text-align: center; color: #888; font-size: 11px; text-decoration: none; flex: 1; cursor: pointer; }
+        .nav-item i { font-size: 20px; display: block; margin-bottom: 3px; }
+        .nav-item.active { color: var(--orange); }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <i class="fas fa-arrow-left" onclick="history.back()"></i>
+    <div class="logo">About Us</div>
+</div>
+
+<div class="content">
+    <h1>🎀MARKET EXPRESS 🎀</h1>
+    <p>Welcome to <b>MARKET EXPRESS</b>, your premier digital destination for high-quality fashion and lifestyle essentials in Nigeria.</p>
+    
+    <h2>Our Mission</h2>
+    <p>We aim to bridge the gap between quality and affordability. Whether you are looking for designer caps, trendy footwear, or luxury perfumes, we curate our inventory to ensure our customers always look their best.</p>
+    
+    <h2>What We Offer</h2>
+    <ul>
+        <li>Designer Caps & Hats</li>
+        <li>Men & Women's Clothing</li>
+        <li>Premium Sneakers & Slides</li>
+        <li>Accessories & Fragrances</li>
+    </ul>
+
+    <h2>Safe Shopping</h2>
+    <p>At 🎀MARKET EXPRESS 🎀, we prioritize safe transactions. We offer flexible payment options including Bank Transfers and Cash on Delivery to ensure every customer feels secure.</p>
+</div>
+
+<div class="nav-bar">
+    <div onclick="window.location.href='index.html'" class="nav-item"><i class="fas fa-home"></i>Home</div>
+    <div onclick="window.location.href='categories.html'" class="nav-item"><i class="fas fa-th-large"></i>Categories</div>
+    <div onclick="window.location.href='cart.html'" class="nav-item"><i class="fas fa-shopping-basket"></i>Cart</div>
+    <div onclick="window.location.href='track.html'" class="nav-item"><i class="fas fa-truck"></i>Track</div>
+</div>
+
+</body>
+</html>

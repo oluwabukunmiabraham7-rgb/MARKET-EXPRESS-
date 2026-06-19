@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account |🎀MARKET EXPRESS 🎀</title>
+    <style>
+        :root { --orange: #f68b1e; --bg: #f5f5f5; }
+        body { font-family: sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        /* Loader CSS */
+        #loadingOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:9999; justify-content:center; align-items:center; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--orange); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .auth-container { padding: 30px 20px; flex: 1; }
+        .logo-box { text-align: center; margin-bottom: 30px; }
+        .logo-box h1 { color: var(--orange); margin: 0; font-size: 28px; }
+        
+        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { margin-top: 0; font-size: 18px; color: #333; }
+        
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        .btn-auth { width: 100%; background: var(--orange); color: white; border: none; padding: 15px; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        .toggle-text { text-align: center; margin-top: 20px; font-size: 14px; color: #666; cursor: pointer; }
+        .toggle-text span { color: var(--orange); font-weight: bold; }
+
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: white; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #ddd; }
+        .nav-item { text-decoration: none; color: #777; font-size: 11px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div id="loadingOverlay"><div class="spinner"></div></div>
+
+<div class="auth-container">
+    <div class="logo-box">
+        <h1>🎀MARKET EXPRESS</h1>
+        <p>Your quality, our priority</p>
+    </div>
+
+    <div class="card" id="loginBox">
+        <h2 id="authTitle">Login to your account</h2>
+        <input type="email" id="email" placeholder="Email Address">
+        <input type="password" id="password" placeholder="Password">
+        <button class="btn-auth" onclick="handleAuth()">CONTINUE</button>
+        <p class="toggle-text" id="toggleBtn" onclick="toggleAuth()">Don't have an account? <span>Register</span></p>
+    </div>
+</div>
+
+<nav class="bottom-nav">
+    <a href="index.html" class="nav-item">🏠<br>Home</a>
+    <a href="cart.html" class="nav-item">🛒<br>Cart</a>
+    <a href="account.html" class="nav-item" style="color:var(--orange)">👤<br>Account</a>
+</nav>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC1w8tUDW6XTfkPceprjj1kJed9CM5r6YA",
+        authDomain: "enitan-collection-7e541.firebaseapp.com",
+        projectId: "enitan-collection-7e541",
+        storageBucket: "enitan-collection-7e541.firebasestorage.app",
+        messagingSenderId: "652278502258",
+        appId: "1:652278502258:web:7e3058b2f96570c728c3eb"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    let isLogin = true;
+
+    window.toggleAuth = () => {
+        isLogin = !isLogin;
+        document.getElementById('authTitle').innerText = isLogin ? "Login to your account" : "Create an account";
+        document.getElementById('toggleBtn').innerHTML = isLogin ? "Don't have an account? <span>Register</span>" : "Already have an account? <span>Login</span>";
+    };
+
+    window.handleAuth = async () => {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('password').value;
+
+        if(!email || !pass) return alert("Please fill all fields");
+
+        // Start Jumia Loader
+        document.getElementById('loadingOverlay').style.display = 'flex';
+
+        try {
+            if(isLogin) {
+                await signInWithEmailAndPassword(auth, email, pass);
+            } else {
+                await createUserWithEmailAndPassword(auth, email, pass);
+            }
+            window.location.href = "index.html";
+        } catch (error) {
+            document.getElementById('loadingOverlay').style.display = 'none';
+            alert(error.message);
+        }
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // If logged in, you could show a "Profile" view here
+            document.getElementById('loginBox').innerHTML = `<h2>Welcome!</h2><p>${user.email}</p><button class="btn-auth" onclick="auth.signOut(); location.reload();">LOGOUT</button>`;
+        }
+    });
+</script>
+</body>
+</html>

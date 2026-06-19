@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | 🎀MARKET EXPRESS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --orange: #f68b1e; --green: #2ecc71; --grey: #f4f7f6; --blue: #3498db; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--grey); margin: 0; padding-bottom: 150px; }
+        
+        .header { background: white; padding: 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #eee; }
+        .header h2 { margin: 0; font-size: 20px; }
+
+        .section-label { padding: 20px 20px 10px; color: #777; font-weight: bold; font-size: 14px; text-transform: uppercase; }
+
+        .selection-area { background: white; margin: 0 15px; border-radius: 15px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .cart-item { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .cart-item img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
+
+        .payment-options { background: white; margin: 0 15px; border-radius: 15px; padding: 10px; }
+        .pay-method { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; }
+        .pay-method:last-child { border-bottom: none; }
+        .pay-method input { width: 20px; margin-right: 15px; cursor: pointer; }
+        .pay-method i { margin-right: 10px; color: var(--orange); font-size: 18px; }
+        .pay-method label { flex: 1; cursor: pointer; font-weight: 500; }
+
+        /* Account Number Box */
+        .account-box {
+            background: #111;
+            color: white;
+            margin: 10px 15px;
+            padding: 20px;
+            border-radius: 15px;
+            display: none; /* Hidden by default */
+        }
+        .account-box.show { display: block; }
+        .acc-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
+        .acc-row b { color: var(--orange); font-size: 16px; }
+
+        /* Confirmation Input Style */
+        .confirm-input {
+            width: 100%; padding: 12px; border: 1px solid var(--orange); 
+            border-radius: 8px; margin-top: 12px; background: #222; color: white;
+            font-size: 14px; outline: none;
+        }
+
+        .name-notice {
+            background: #fff4e6; border: 1px dashed var(--orange); color: #d47500;
+            margin: 10px 15px; padding: 12px; border-radius: 10px; font-size: 13px;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .contact-card { background: white; margin: 0 15px; border-radius: 15px; padding: 20px; border-left: 6px solid var(--orange); }
+        .input-box { margin-bottom: 15px; }
+        input, textarea { width: 100%; padding: 15px; border: 1.5px solid #eee; border-radius: 10px; box-sizing: border-box; font-size: 15px; outline: none; }
+
+        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); z-index: 1000; }
+        .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .total-amount { color: var(--orange); font-size: 22px; font-weight: 800; }
+        .btn-order { background: var(--green); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; width: 100%; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <i class="fas fa-arrow-left" onclick="history.back()"></i>
+    <h2>Checkout</h2>
+</div>
+
+<div class="section-label">Your Selection</div>
+<div class="selection-area" id="cartItems"></div>
+
+<div class="section-label">Payment Method</div>
+<div class="payment-options">
+    <div class="pay-method" onclick="toggleAccount(true)">
+        <input type="radio" name="payType" id="payTransfer" value="Bank Transfer" checked>
+        <i class="fas fa-university"></i>
+        <label>Pay Now via Transfer</label>
+    </div>
+    <div class="pay-method" onclick="toggleAccount(false)">
+        <input type="radio" name="payType" id="payCash" value="Cash on Delivery">
+        <i class="fas fa-hand-holding-usd"></i>
+        <label>Cash on Delivery</label>
+    </div>
+</div>
+
+<div id="accDetails" class="account-box show">
+    <div style="font-weight: bold; margin-bottom: 10px; color: var(--orange);">TRANSFER TO:</div>
+    <div class="acc-row">Bank Name: <b>Access</b></div>
+    <div class="acc-row">Account Number: <b>0814639252</b></div>
+    <div class="acc-row">Account Name: <b>Akande Ruth Ajoke</b></div>
+    <hr style="border: 0.2px solid #333; margin: 15px 0;">
+    <div style="font-size: 12px; color: #bbb; margin-bottom: 5px;">CONFIRMATION:</div>
+    <input type="text" id="transRef" class="confirm-input" placeholder="Type Sender Name used for Transfer">
+</div>
+
+<div class="section-label">Contact & Delivery</div>
+<div class="name-notice">
+    <i class="fas fa-exclamation-triangle"></i>
+    <span><strong>Notice:</strong> Please ensure the name you put below matches the name on your <strong>transaction receipt ,then if you are paying  via transfer before delivery make sure you send your receipt to the WhatsApp number  you will be ask to message </strong> after placing your order.</span>
+</div>
+
+<div class="contact-card">
+    <div class="input-box"><input type="text" id="custName" placeholder="Full Name (as on receipt)"></div>
+    <div class="input-box"><input type="tel" id="custPhone" placeholder="WhatsApp Number"></div>
+    <div class="input-box"><textarea id="custAddr" placeholder="Delivery Address" rows="3"></textarea></div>
+</div>
+
+<div class="bottom-bar">
+    <div class="total-row">
+        <b>Total Amount</b>
+        <span class="total-amount" id="totalPrice">₦0</span>
+    </div>
+    <button class="btn-order" onclick="processOrder()">PLACE ORDER NOW</button>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = { 
+        apiKey: "AIzaSyC1w8tUDW6XTfkPceprjj1kJed9CM5r6YA", 
+        authDomain: "enitan-collection-7e541.firebaseapp.com", 
+        projectId: "enitan-collection-7e541" 
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let cart = JSON.parse(localStorage.getItem('enitan_cart')) || [];
+    const cartList = document.getElementById('cartItems');
+    const totalDisp = document.getElementById('totalPrice');
+
+    window.toggleAccount = (show) => {
+        const box = document.getElementById('accDetails');
+        const radio = show ? document.getElementById('payTransfer') : document.getElementById('payCash');
+        radio.checked = true;
+        if(show) box.classList.add('show');
+        else box.classList.remove('show');
+    };
+
+    function renderCart() {
+        if(cart.length === 0) {
+            cartList.innerHTML = `<div style="text-align:center; color:#aaa; padding:20px;">Cart is empty</div>`;
+            return;
+        }
+        cartList.innerHTML = cart.map((item, index) => `
+            <div class="cart-item">
+                <img src="${item.image}">
+                <div style="flex:1">
+                    <div style="font-weight:600; font-size:14px;">${item.name}</div>
+                    <div style="color:var(--orange); font-weight:700;">₦${Number(item.price).toLocaleString()}</div>
+                </div>
+                <i class="fas fa-trash-alt" style="color:#ff4757" onclick="removeItem(${index})"></i>
+            </div>
+        `).join('');
+        const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
+        totalDisp.innerText = `₦${total.toLocaleString()}`;
+    }
+
+    window.removeItem = (i) => {
+        cart.splice(i, 1);
+        localStorage.setItem('enitan_cart', JSON.stringify(cart));
+        renderCart();
+    };
+
+    window.processOrder = async () => {
+        const name = document.getElementById('custName').value;
+        const phone = document.getElementById('custPhone').value;
+        const addr = document.getElementById('custAddr').value;
+        const payMethod = document.querySelector('input[name="payType"]:checked').value;
+        const senderName = document.getElementById('transRef').value;
+
+        if(!name || !phone || !addr || cart.length === 0) {
+            return alert("Please fill details and add items.");
+        }
+
+        // Fix: Ensure they provide a sender name if using Transfer
+        if(payMethod === "Bank Transfer" && !senderName) {
+            return alert("Please type the Sender Name used for the transfer in the black box.");
+        }
+
+        const orderId = "ENI-" + Math.floor(Math.random() * 90000 + 10000);
+        const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
+
+        try {
+            await addDoc(collection(db, "orders"), {
+                orderId, 
+                customerName: name, 
+                phone, 
+                address: addr,
+                total, 
+                status: "Pending", 
+                paymentMethod: payMethod,
+                transactionRef: senderName || "N/A", // This sends the name to Admin
+                timestamp: serverTimestamp()
+            });
+
+            const itemsList = cart.map(i => `- ${i.name} (₦${i.price})`).join('\n');
+            const summary = {
+                orderId, name, phone, addr, total, payMethod, itemsList, senderName
+            };
+            
+            localStorage.setItem('last_order', JSON.stringify(summary));
+            localStorage.removeItem('enitan_cart');
+            window.location.href = "success.html";
+        } catch (e) {
+            alert("Connection error. Try again.");
+        }
+    };
+
+    renderCart();
+</script>
+</body>
+</html>

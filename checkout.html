@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout | 🎀 MARKET EXPRESS 🎀</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container" style="max-width: 700px;">
+        <h2 style="margin-bottom: 20px; color: var(--jumia-dark);">Checkout</h2>
+
+        <div class="admin-card" style="border-top: 5px solid var(--jumia-orange);">
+            <h4 style="color: var(--jumia-orange); margin-bottom: 10px;">STEP 1: BANK TRANSFER</h4>
+            <p style="margin-bottom: 5px;">Transfer total amount to the account below:</p>
+            <div style="background: #fff8f0; padding: 15px; border-radius: 4px; border: 1px dashed #f68b1e;">
+                <p>Bank: <strong>Opay</strong></p>
+                <p>Account Number: <strong>08165631720</strong></p>
+                <p>Account Name: <strong>ISMAIL AYOBAMI ABRAHAM</strong></p>
+            </div>
+            <p style="font-size: 0.8rem; color: #d9534f; margin-top: 10px;">* Use your <strong>Full Name</strong> as the transfer description.</p>
+        </div>
+
+        <div class="admin-card">
+            <h4 style="margin-bottom: 15px;">STEP 2: DELIVERY INFO</h4>
+            <form id="checkoutForm">
+                <input type="text" id="custName" placeholder="Your Full Name" style="width:100%; padding:12px; margin-bottom:15px; border: 1px solid #ccc;" required>
+                <input type="text" id="custAddr" placeholder="Complete Delivery Address" style="width:100%; padding:12px; margin-bottom:15px; border: 1px solid #ccc;" required>
+                <input type="tel" id="custPhone" placeholder="WhatsApp Number (081...)" style="width:100%; padding:12px; margin-bottom:15px; border: 1px solid #ccc;" required>
+                
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Which bank did you pay from?</label>
+                <input type="text" id="custBank" placeholder="e.g. GTB, Kuda, Zenith" style="width:100%; padding:12px; margin-bottom:15px; border: 1px solid #ccc;" required>
+
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Delivery Method:</label>
+                <select id="deliveryOption" onchange="calculateFinalTotal()" style="width:100%; padding:12px; margin-bottom:20px;">
+                    <option value="0">Store Pickup (₦0)</option>
+                    <option value="1000">Home Delivery (₦1,000)</option>
+                </select>
+
+                <div style="background: #f9f9f9; padding: 20px; border-radius: 4px; text-align: center;">
+                    <h3 style="font-size: 1.5rem;">Total to Pay: <span id="finalTotalDisplay" style="color: var(--jumia-orange);">₦0</span></h3>
+                </div>
+
+                <button type="submit" class="btn-add" style="margin-top: 20px; padding: 15px;">PLACE ORDER & NOTIFY ON WHATSAPP👍</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db, collection, addDoc, serverTimestamp } from './firebase.js';
+
+        let cart = JSON.parse(localStorage.getItem('enitan_cart')) || [];
+        if (cart.length === 0) window.location.href = 'index.html';
+
+        window.calculateFinalTotal = () => {
+            const subtotal = cart.reduce((acc, item) => acc + item.price, 0);
+            const delivery = Number(document.getElementById('deliveryOption').value);
+            const grandTotal = subtotal + delivery;
+            document.getElementById('finalTotalDisplay').innerText = `₦${grandTotal.toLocaleString()}`;
+        };
+
+        document.getElementById('checkoutForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const orderID = 'MAret expreSs-' + Math.floor(1000 + Math.random() * 9000);
+            const name = document.getElementById('custName').value;
+            const total = document.getElementById('finalTotalDisplay').innerText;
+            const bank = document.getElementById('custBank').value;
+
+            const orderData = {
+                orderID: orderID,
+                customerName: name,
+                address: document.getElementById('custAddr').value,
+                phone: document.getElementById('custPhone').value,
+                bankUsed: bank,
+                deliveryFee: document.getElementById('deliveryOption').value,
+                items: cart,
+                totalAmount: total,
+                timestamp: serverTimestamp()
+            };
+
+            try {
+                await addDoc(collection(db, "orders"), orderData);
+                
+                // Construct WhatsApp Link
+                const waMessage = `*NEW ORDER FROM MARKET EXPRESS*\n\n` +
+                                 `*Order ID:* ${orderID}\n` +
+                                 `*Customer:* ${name}\n` +
+                                 `*Bank Paid From:* ${bank}\n` +
+                                 `*Total Amount:* ${total}\n\n` +
+                                 `I am sending my transfer receipt now!`;
+                
+                const waURL = `https://wa.me/2348165631720?text=${encodeURIComponent(waMessage)}`;
+                
+                alert(`Order ${orderID} successful! Redirecting to WhatsApp to send receipt.`);
+                localStorage.removeItem('Market_cart');
+                window.location.href = waURL;
+            } catch (err) {
+                alert("Error placing order: " + err.message);
+            }
+        };
+
+        calculateFinalTotal();
+    </script>
+</body>
+</html>

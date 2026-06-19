@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Success | 🎀 MARKET EXPRESS 🎀</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --orange: #f68b1e; --green: #2ecc71; --grey: #f4f7f6; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--grey); 
+            margin: 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh;
+            text-align: center;
+        }
+
+        .success-card {
+            background: white;
+            width: 90%;
+            max-width: 400px;
+            padding: 40px 20px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            background: #e8f9ef;
+            color: var(--green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 20px;
+        }
+
+        h1 { margin: 10px 0; color: #111; font-size: 24px; }
+        p { color: #666; font-size: 15px; line-height: 1.5; margin-bottom: 25px; }
+
+        .order-id-box {
+            background: #fdf5eb;
+            border: 1px dashed var(--orange);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+        .order-id-box span { display: block; color: #777; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+        .order-id-box b { color: var(--orange); font-size: 20px; letter-spacing: 1px; }
+
+        .btn-whatsapp {
+            background: #25d366;
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 16px;
+            width: 100%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-home {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="success-card">
+    <div class="icon-box">
+        <i class="fas fa-check-circle"></i>
+    </div>
+    
+    <h1>Order Received!</h1>
+    <p>Your order has been logged successfully. Please click the button below to send your receipt to us on WhatsApp to confirm delivery.</p>
+    <p>MAKE SURE YOU COPY OR WRITE DOWN YOUR ("ORDER ID") FOR YOUR GOODS TRACKING 🔥🔥🔥</p>
+
+    <div class="order-id-box">
+        <span>Your Order ID</span>
+        <b id="displayOrderId">-------</b>
+    </div>
+
+    <button class="btn-whatsapp" onclick="sendToWhatsApp()">
+        <i class="fab fa-whatsapp"></i>
+        CONFIRM ON WHATSAPP
+    </button>
+
+    <a href="index.html" class="btn-home">Back to 🏠</a>
+</div>
+
+<script>
+    // 1. Get the order details we saved in checkout.html
+    const orderData = JSON.parse(localStorage.getItem('last_order'));
+
+    // 2. Display the Order ID on the screen
+    if (orderData && orderData.orderId) {
+        document.getElementById('displayOrderId').innerText = orderData.orderId;
+    } else {
+        // If someone visits this page without an order, send them home
+        window.location.href = "index.html";
+    }
+
+    // 3. Function to format and send the WhatsApp message
+    function sendToWhatsApp() {
+        if (!orderData) return alert("Order details not found!");
+
+        // Format the message with line breaks (%0A)
+        const message = `*NEW ORDER CONFIRMATION*%0A` +
+                        `--------------------------%0A` +
+                        `*Order ID:* ${orderData.orderId}%0A` +
+                        `*Customer:* ${orderData.name}%0A` +
+                        `*Phone:* ${orderData.phone}%0A` +
+                        `*Address:* ${orderData.addr}%0A` +
+                        `*Payment:* ${orderData.payMethod}%0A` +
+                        `--------------------------%0A` +
+                        `*Items:*%0A${orderData.itemsList.replace(/\n/g, '%0A')}%0A` +
+                        `--------------------------%0A` +
+                        `*Total Amount:* ₦${orderData.total.toLocaleString()}`;
+
+        const phoneNumber = "2347078904091"; // Your provided number
+        const waLink = `https://wa.me/${phoneNumber}?text=${message}`;
+
+        // Open WhatsApp
+        window.open(waLink, '_blank');
+    }
+</script>
+
+</body>
+</html>

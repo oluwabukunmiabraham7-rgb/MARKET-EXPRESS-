@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Order |🎀 MARKET EXPRESS 🎀</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: sans-serif; background: #f8f9fa; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); max-width: 400px; margin: 0 auto; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #eee; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; background: #f68b1e; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        #statusDisplay { margin-top: 20px; padding: 15px; border-radius: 10px; background: #fff; border: 1px solid #eee; }
+        .status-tag { font-weight: bold; color: #f68b1e; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Track Your Order</h2>
+    <input type="text" id="trackId" placeholder="Enter Order ID (e.g., ORD123)">
+    <button onclick="trackOrder()">TRACK ORDER</button>
+</div>
+
+<div id="statusDisplay" style="display:none; max-width: 400px; margin: 20px auto;"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = { 
+        apiKey: "AIzaSyC1w8tUDW6XTfkPceprjj1kJed9CM5r6YA", 
+        authDomain: "enitan-collection-7e541.firebaseapp.com", 
+        projectId: "enitan-collection-7e541" 
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.trackOrder = async () => {
+        const id = document.getElementById('trackId').value.trim();
+        if (!id) return alert("Please enter an Order ID");
+
+        const display = document.getElementById('statusDisplay');
+        display.style.display = 'block';
+        display.innerHTML = "Searching...";
+
+        try {
+            const q = query(collection(db, "orders"), where("orderId", "==", id));
+            const snap = await getDocs(q);
+            
+            if (!snap.empty) {
+                const data = snap.docs[0].data();
+                display.innerHTML = `
+                    <h3>Order Status: <span class="status-tag">${data.status || 'Pending'}</span></h3>
+                    <p><b>Customer:</b> ${data.customerName}</p>
+                    <p><b>Estimated Delivery:</b> ${data.deliveryDate || 'Not yet scheduled'}</p>
+                    <p><b>Address:</b> ${data.address}</p>
+                `;
+            } else {
+                display.innerHTML = "Order not found. Please check your ID and try again.";
+            }
+        } catch (e) {
+            display.innerHTML = "Error connecting to server.";
+            console.error(e);
+        }
+    };
+</script>
+</body>
+</html>

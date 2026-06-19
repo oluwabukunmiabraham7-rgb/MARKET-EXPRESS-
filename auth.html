@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Register | Enitan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --orange: #f68b1e; --grey: #f8f9fa; }
+        body { font-family: sans-serif; margin: 0; background: var(--grey); display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .auth-card { background: white; width: 90%; max-width: 400px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
+        .logo { font-size: 28px; font-weight: 900; margin-bottom: 20px; color: #000; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; background: #fafafa; }
+        .auth-btn { width: 100%; padding: 15px; background: var(--orange); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        .toggle-link { margin-top: 20px; display: block; color: #666; font-size: 14px; text-decoration: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="auth-card">
+    <div class="logo">🎀MARKET EXPRESS 🎀.</div>
+    <h3 id="authTitle">Create Account</h3>
+    
+    <input type="text" id="userName" placeholder="Full Name">
+    <input type="email" id="userEmail" placeholder="Email Address">
+    <input type="password" id="userPass" placeholder="Password">
+    
+    <button class="auth-btn" onclick="handleAuth()">CONTINUE</button>
+    
+    <p class="toggle-link" id="toggleText" onclick="toggleMode()">Already have an account? Login</p>
+</div>
+
+<script>
+    let isLogin = false;
+
+    function toggleMode() {
+        isLogin = !isLogin;
+        document.getElementById('authTitle').innerText = isLogin ? "Welcome Back" : "Create Account";
+        document.getElementById('userName').style.display = isLogin ? "none" : "block";
+        document.getElementById('toggleText').innerText = isLogin ? "Need an account? Register" : "Already have an account? Login";
+    }
+
+    function handleAuth() {
+        const name = document.getElementById('userName').value;
+        const email = document.getElementById('userEmail').value;
+        
+        if(!email) return alert("Please enter email");
+
+        // Save user session locally
+        const userData = { name: isLogin ? "Customer" : name, email: email };
+        localStorage.setItem('enitan_user', JSON.stringify(userData));
+
+        // CHECK REDIRECT: If they came from cart, send them back to cart
+        const returnPage = localStorage.getItem('redirect_after_auth');
+        if (returnPage) {
+            localStorage.removeItem('redirect_after_auth');
+            window.location.href = returnPage;
+        } else {
+            window.location.href = 'index.html';
+        }
+    }
+</script>
+</body>
+</html>
