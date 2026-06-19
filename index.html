@@ -6,7 +6,7 @@
     <title>🎀 MARKET EXPRESS| Home</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --orange: #f68b1e; --grey: #f8f9fa; --blue: #007bff; }
+        :root { --orange: #f68b1e; --grey: #f8f9fa; --blue: #007bff; --yellow: #f1c40f; }
         body { font-family: sans-serif; margin: 0; background: var(--grey); padding-bottom: 120px; }
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; justify-content: center; align-items: center; }
         .spinner { width: 35px; height: 35px; border: 4px solid #f3f3f3; border-top: 4px solid var(--orange); border-radius: 50%; animation: spin 1s linear infinite; }
@@ -31,12 +31,24 @@
 
         /* Product Grid */
         .container { padding: 0 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .product-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid #eee; }
+        .product-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid #eee; display: flex; flex-direction: column; justify-content: space-between; }
         .product-card img { width: 100%; height: 130px; object-fit: cover; background: #eee; }
-        .p-info { padding: 8px; }
+        .p-info { padding: 8px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .p-info b { font-size: 13px; display: block; margin-bottom: 3px; color: #333; }
-        .p-info span { color: var(--orange); font-weight: 800; font-size: 14px; }
+        .p-info span { color: var(--orange); font-weight: 800; font-size: 14px; display: block; margin-bottom: 5px; }
         .add-btn { width: 100%; background: var(--orange); color: white; border: none; padding: 8px; border-radius: 8px; margin-top: 6px; font-weight: bold; cursor: pointer; font-size: 11px; }
+
+        /* Review Section Styling */
+        .review-section { border-top: 1px dashed #eee; padding-top: 8px; margin-top: 8px; text-align: left; }
+        .review-title { font-size: 11px; font-weight: bold; color: #666; margin-bottom: 4px; display: block; }
+        .rating-stars-input { color: #ccc; font-size: 14px; margin-bottom: 6px; display: flex; gap: 3px; }
+        .rating-stars-input i { cursor: pointer; }
+        .rating-stars-input i.active { color: var(--yellow); }
+        .review-input-box { display: flex; gap: 4px; margin-bottom: 4px; }
+        .review-text-input, .review-name-input { padding: 6px; border: 1px solid #eee; border-radius: 6px; font-size: 11px; outline: none; background: #fafafa; box-sizing: border-box; }
+        .review-name-input { width: 40%; }
+        .review-text-input { width: 60%; }
+        .submit-review-btn { background: var(--blue); color: white; border: none; padding: 5px; border-radius: 6px; font-weight: bold; font-size: 10px; cursor: pointer; width: 100%; text-transform: uppercase; }
 
         /* Footer Links for AdSense */
         .footer-links { text-align: center; padding: 30px 15px; background: white; margin-top: 20px; border-top: 1px solid #eee; }
@@ -91,7 +103,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, query, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, query, onSnapshot, orderBy, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = { 
         apiKey: "AIzaSyC1w8tUDW6XTfkPceprjj1kJed9CM5r6YA", 
@@ -115,12 +127,81 @@
             <div class="product-card">
                 <img src="${item.image}" alt="${item.name}">
                 <div class="p-info">
-                    <b>${item.name}</b>
-                    <span>₦${Number(item.price).toLocaleString()}</span>
+                    <div>
+                        <b>${item.name}</b>
+                        <span>₦${Number(item.price).toLocaleString()}</span>
+                    </div>
                     <button class="add-btn" onclick="addToCart('${item.name}', '${item.price}', '${item.image}')">ADD TO CART</button>
+                    
+                    <!-- REVIEWS AND STAR RATING INPUT BOX -->
+                    <div class="review-section">
+                        <span class="review-title">Rate & Review:</span>
+                        <div class="rating-stars-input" id="stars-${item.id}">
+                            <i class="fas fa-star" onclick="setProductStarRating('${item.id}', 1)"></i>
+                            <i class="fas fa-star" onclick="setProductStarRating('${item.id}', 2)"></i>
+                            <i class="fas fa-star" onclick="setProductStarRating('${item.id}', 3)"></i>
+                            <i class="fas fa-star" onclick="setProductStarRating('${item.id}', 4)"></i>
+                            <i class="fas fa-star" onclick="setProductStarRating('${item.id}', 5)"></i>
+                        </div>
+                        <input type="hidden" id="rating-val-${item.id}" value="0">
+                        <div class="review-input-box">
+                            <input type="text" class="review-name-input" id="name-input-${item.id}" placeholder="Your Name">
+                            <input type="text" class="review-text-input" id="text-input-${item.id}" placeholder="Great product!">
+                        </div>
+                        <button class="submit-review-btn" onclick="submitUserReview('${item.id}', '${item.name.replace(/'/g, "\\'")}')">Submit Review</button>
+                    </div>
                 </div>
             </div>`).join('');
     }
+
+    // Interactive Star Picker Engine
+    window.setProductStarRating = (pId, rating) => {
+        const starContainer = document.getElementById(`stars-${pId}`);
+        const stars = starContainer.querySelectorAll('i');
+        document.getElementById(`rating-val-${pId}`).value = rating;
+        
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.add('active');
+            } else {
+                star.classList.remove('active');
+            }
+        });
+    };
+
+    // Review Submission Engine to Database
+    window.submitUserReview = async (pId, productName) => {
+        const customerName = document.getElementById(`name-input-${pId}`).value.trim();
+        const comment = document.getElementById(`text-input-${pId}`).value.trim();
+        const rating = parseInt(document.getElementById(`rating-val-${pId}`).value);
+
+        if (!customerName || !comment) {
+            return alert("Please fill in both your name and comment field!");
+        }
+        if (rating === 0) {
+            return alert("Please select a star rating by tapping on the stars!");
+        }
+
+        try {
+            await addDoc(collection(db, "reviews"), {
+                productId: pId,
+                productName: productName,
+                customerName: customerName,
+                comment: comment,
+                rating: rating,
+                timestamp: serverTimestamp()
+            });
+            alert("Review submitted successfully! Thank you.");
+            
+            // Clear fields safely after use
+            document.getElementById(`name-input-${pId}`).value = "";
+            document.getElementById(`text-input-${pId}`).value = "";
+            window.setProductStarRating(pId, 0);
+        } catch (error) {
+            console.error("Error submitting review: ", error);
+            alert("Submission error. Please check your network and try again.");
+        }
+    };
 
     window.handleSearch = () => {
         const term = document.getElementById('searchBox').value.toLowerCase();
